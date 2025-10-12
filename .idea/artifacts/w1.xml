@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="war" build-on-make="true" name="w1">
+    <output-path>$PROJECT_DIR$/out/artifacts/w1</output-path>
+    <root id="archive" name="w1.war" />
+  </artifact>
+</component>
