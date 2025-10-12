@@ -3,6 +3,10 @@
 <head><title>Login</title></head>
 <body>
 <h2>User Login</h2>
+<%--<% String msg = (String) request.getAttribute("message"); %>--%>
+<%--<% if (msg != null) { %>--%>
+<%--<p style="color:blue;"><%= msg %></p>--%>
+<%--<% } %>--%>
 <form action="${pageContext.request.contextPath}/auth" method="post">
     <input type="hidden" name="action" value="login">
 

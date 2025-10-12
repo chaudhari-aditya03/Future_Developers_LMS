@@ -4,6 +4,10 @@
 <head><title>Register</title></head>
 <body>
 <h2>User Registration</h2>
+<%--<% String msg = (String) request.getAttribute("message"); %>--%>
+<%--<% if (msg != null) { %>--%>
+<%--<p style="color:blue;"><%= msg %></p>--%>
+<%--<% } %>--%>
 <form action="${pageContext.request.contextPath}/auth" method="post">
     <input type="hidden" name="action" value="register">
 
