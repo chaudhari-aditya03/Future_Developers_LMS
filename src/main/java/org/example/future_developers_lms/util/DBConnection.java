@@ -1,4 +1,4 @@
-package org.example.future_developers_lms.utils;
+package org.example.future_developers_lms.util;
 
 
 import java.sql.Connection;
