@@ -6,19 +6,26 @@ import jakarta.servlet.annotation.*;
 import java.io.IOException;
 import org.example.future_developers_lms.model.User;
 import org.example.future_developers_lms.dao.UserDAO;
-import org.example.future_developers_lms.util.ValidationUtil;
 
 @WebServlet("/auth")
 public class AuthServlet extends HttpServlet {
 
     private UserDAO userDAO;
-    private ValidationUtil validationUtil;
 
     @Override
     public void init() {
         userDAO = new UserDAO();
     }
 
+    // Handles direct GET requests to /auth (redirect to login)
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+    }
+
+    // Main POST Handler
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -28,28 +35,29 @@ public class AuthServlet extends HttpServlet {
             handleRegister(request, response);
         } else if ("login".equalsIgnoreCase(action)) {
             handleLogin(request, response);
-        } else if ("forgotPassword".equals(action)) {
-            forgotPassword(request, response);
-         }
-        else {
-            response.sendRedirect("views/auth/login.jsp");
+        } else if ("forgotPassword".equalsIgnoreCase(action)) {
+            handleForgotPassword(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         }
     }
-//Registration of User
+
+    // -------------------- REGISTER --------------------
     private void handleRegister(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String role = request.getParameter("role");  // from dropdown (ADMIN/TEACHER/STUDENT)
+        String role = request.getParameter("role");
 
+        // Validate password strength
         if (!isValidPassword(password)) {
-            request.setAttribute("message", "Password must be at least 8 characters, contain uppercase, lowercase, digit, and special character.");
-            RequestDispatcher rd = request.getRequestDispatcher("views/auth/register.jsp");
-            rd.forward(request, response);
+            request.setAttribute("message", "Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.");
+            request.getRequestDispatcher("/views/auth/register.jsp").forward(request, response);
             return;
         }
+
         String hashedPassword = hashPassword(password);
         User user = new User();
         user.setFullName(fullName);
@@ -60,16 +68,17 @@ public class AuthServlet extends HttpServlet {
         boolean success = userDAO.registerUserBasic(user);
 
         if (success) {
-            request.setAttribute("message", " Registration successful! Please login.");
-            RequestDispatcher rd = request.getRequestDispatcher("/views/auth/login.jsp");
-            rd.forward(request, response);
+            // Registration success → go to login.jsp with message
+            request.setAttribute("message", "Registration successful! Please login.");
+            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         } else {
-            request.setAttribute("message", " Email already exists or registration failed.");
-            RequestDispatcher rd = request.getRequestDispatcher("/views/auth/register.jsp");
-            rd.forward(request, response);
+            // Registration failed → stay on register.jsp
+            request.setAttribute("message", "Email already exists or registration failed.");
+            request.getRequestDispatcher("/views/auth/register.jsp").forward(request, response);
         }
     }
-//Login the User
+
+    // -------------------- LOGIN --------------------
     private void handleLogin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -77,87 +86,98 @@ public class AuthServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
+        // Basic field validation
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
             request.setAttribute("message", "Email and password are required.");
-            request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
 
-        //  Validate password format again (optional but recommended)
+        // Password format validation (optional)
         if (!isValidPassword(password)) {
-            request.setAttribute("message", "Invalid password format. Please check your password.");
-            request.getRequestDispatcher("views/auth/login.jsp").forward(request, response);
+            request.setAttribute("message", "Invalid password format.");
+            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
             return;
         }
+
         String hashedPassword = hashPassword(password);
         User user = userDAO.loginUser(email, hashedPassword, role);
 
         if (user != null) {
             HttpSession session = request.getSession();
+            session.setAttribute("user_id", user.getUserId());
+            session.setAttribute("role", user.getRole());
             session.setAttribute("user", user);
 
-            // redirect based on role
-            switch (role) {
+            // Redirect based on role (with context path)
+            switch (user.getRole()) {
                 case "ADMIN":
-                    response.sendRedirect("views/admin/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/views/admin/dashboard.jsp");
                     break;
                 case "TEACHER":
-                    response.sendRedirect("views/teacher/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/views/teacher/dashboard.jsp");
                     break;
                 default:
-                    response.sendRedirect("views/student/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/views/student/dashboard.jsp");
                     break;
             }
         } else {
-            request.setAttribute("message", " Invalid credentials or role mismatch!");
-            RequestDispatcher rd = request.getRequestDispatcher("/views/auth/login.jsp");
-            rd.forward(request, response);
+            request.setAttribute("message", "Invalid credentials or role mismatch!");
+            request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         }
     }
-    //Forgot Password
-    private void forgotPassword(HttpServletRequest request, HttpServletResponse response)
+
+    // -------------------- FORGOT PASSWORD --------------------
+    private void handleForgotPassword(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
+
         String email = request.getParameter("email");
         String newPassword = request.getParameter("new_password");
+
         if (!userDAO.isEmailExists(email)) {
             request.setAttribute("message", "Email not found!");
-            request.getRequestDispatcher("views/auth/forgotPassword.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/forgotPassword.jsp").forward(request, response);
             return;
         }
+
         if (!isValidPassword(newPassword)) {
-            request.setAttribute("message", "Password must be at least 8 characters, contain uppercase, lowercase, digit, and special character.");
-            request.getRequestDispatcher("views/auth/forgotPassword.jsp").forward(request, response);
+            request.setAttribute("message", "Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character.");
+            request.getRequestDispatcher("/views/auth/forgotPassword.jsp").forward(request, response);
             return;
         }
+
         String hashedPassword = hashPassword(newPassword);
+
         if (userDAO.updatePassword(email, hashedPassword)) {
-            request.setAttribute("message", "Password reset Successfully!");
-            response.sendRedirect("views/auth/login.jsp?reset=success");
+            // Redirect to login.jsp after success
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp?reset=success");
         } else {
             request.setAttribute("message", "Failed to reset password!");
-            request.getRequestDispatcher("views/auth/forgotPassword.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/forgotPassword.jsp").forward(request, response);
         }
     }
-    //Password Validation
+
+    // -------------------- UTILITIES --------------------
     private boolean isValidPassword(String password) {
         if (password == null) return false;
         String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
         return password.matches(regex);
     }
-        private String hashPassword(String password) {
-            try {
-                java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-                byte[] hash = md.digest(password.getBytes("UTF-8"));
-                StringBuilder hexString = new StringBuilder();
 
-                for (byte b : hash) {
-                    String hex = Integer.toHexString(0xff & b);
-                    if (hex.length() == 1) hexString.append('0');
-                    hexString.append(hex);
-                }
-                return hexString.toString();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+    private String hashPassword(String password) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes("UTF-8"));
+            StringBuilder hexString = new StringBuilder();
+
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 }
