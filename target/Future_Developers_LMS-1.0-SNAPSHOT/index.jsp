@@ -1,175 +1,161 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Management System - Home</title>
-    <style>
-        /* Basic styles for the entire page */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        /* Main container to center content */
-        .container {
-            width: 80%;
-            max-width: 1200px;
-            margin: auto;
-            overflow: hidden;
-            padding: 0 2rem;
-        }
-
-        /* Header section */
-        .main-header {
-            background: #ffffff;
-            padding: 1rem 0;
-            border-bottom: 2px solid #007bff;
-            text-align: center;
-        }
-
-        .main-header h1 {
-            margin: 0;
-            color: #007bff;
-            font-size: 2.5rem;
-        }
-
-        /* Hero section for the main welcome message */
-        .hero {
-            background: #007bff;
-            color: #ffffff;
-            padding: 4rem 0;
-            text-align: center;
-        }
-
-        .hero h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-        }
-
-        /* Main content sections */
-        .content-section {
-            padding: 3rem 0;
-            text-align: center;
-        }
-
-        .content-section h2 {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            color: #333;
-        }
-
-        /* Features grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            text-align: left;
-        }
-
-        .feature-card {
-            background: #ffffff;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .feature-card h3 {
-            margin-top: 0;
-            color: #007bff;
-        }
-
-        /* Call-to-action navigation buttons */
-        .cta-buttons {
-            margin-top: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            background: #28a745;
-            color: #fff;
-            padding: 12px 25px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1.1rem;
-            margin: 0 10px;
-            transition: background-color 0.3s;
-        }
-
-        .btn:hover {
-            background: #218838;
-        }
-
-        .btn-login {
-            background: #007bff;
-        }
-
-        .btn-login:hover {
-            background: #0056b3;
-        }
-
-        /* Footer */
-        .main-footer {
-            background: #333;
-            color: #fff;
-            text-align: center;
-            padding: 1.5rem 0;
-            margin-top: 2rem;
-        }
-
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Future Developers LMS | Learn. Build. Grow.</title>
+    <link rel="stylesheet" href="views/assets/css/style.css" />
+    <link rel="stylesheet" href="views/assets/css/responsive.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<header class="main-header">
-    <div class="container">
-        <h1>Future Developers LMS</h1>
+<!-- ===== NAVBAR ===== -->
+<header class="navbar">
+    <div class="container nav-container">
+        <div class="nav-left">
+            <img src="views/assets/images/FD.jpeg" class="logo" alt="Future Developers Logo">
+            <h1>Future Developers</h1>
+        </div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.jsp" class="active">Home</a></li>
+                <li><a href="views/courses.jsp">Courses</a></li>
+                <li><a href="views/about.jsp">About</a></li>
+                <li><a href="views/contact.jsp">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="nav-actions">
+            <a href="views/auth/login.jsp" class="btn-outline">Login</a>
+            <a href="views/auth/register.jsp" class="btn-primary">Get Started</a>
+        </div>
+        <div class="menu-toggle"><i class="fas fa-bars"></i></div>
     </div>
 </header>
 
+<!-- ===== HERO SECTION ===== -->
 <section class="hero">
-    <div class="container">
-        <h2>Empowering the Next Generation of Developers</h2>
-        <p>A seamless platform for learning, teaching, and managing educational content.</p>
+    <div class="container hero-container">
+        <div class="hero-text">
+            <h1>Learn. Build. <span>Grow Your Future</span></h1>
+            <p>Empowering learners to master technology through engaging courses, real projects, and expert mentors.</p>
+            <div class="hero-actions">
+                <a href="views/courses.jsp" class="btn-primary">Explore Courses</a>
+                <a href="views/auth/register.jsp" class="btn-outline">Join Now</a>
+            </div>
+            <div class="hero-stats">
+                <div><h3>10K+</h3><p>Active Learners</p></div>
+                <div><h3>300+</h3><p>Courses</p></div>
+                <div><h3>95%</h3><p>Success Rate</p></div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="views/assets/images/main1.webp" alt="Learning Illustration">
+        </div>
     </div>
 </section>
 
-<main class="container">
-    <section class="content-section">
-        <h2>Core Features</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Unified Access</h3>
-                <p>Dedicated portals and features for Students, Teachers, and Administrators.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Comprehensive Management</h3>
-                <p>Easily manage courses, notes, assessments, and student attendance.</p>
-            </div>
-            <div class="feature-card">
-                <h3>Insightful Analytics</h3>
-                <p>Track student progress with a powerful dashboard and analytics tools.</p>
+<!-- ===== FEATURES ===== -->
+<section class="features">
+    <h2>Why Choose Future Developers?</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>Expert Instructors</h3>
+            <p>Learn from experienced mentors who guide you
+                step by step.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-laptop-code"></i>
+            <h3>Practical Learning</h3>
+            <p>Hands-on projects and coding practice for real-world skills.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-certificate"></i>
+            <h3>Certifications</h3>
+            <p>Get industry-recognized certificates upon course completion.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-clock"></i>
+            <h3>Flexible Access</h3>
+            <p>Learn anytime, anywhere, at your own pace.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== POPULAR COURSES ===== -->
+<section class="courses">
+    <h2>Popular Courses</h2>
+    <div class="course-grid">
+        <div class="course-card">
+            <img src="views/assets/images/java.jpg" alt="Java Full Stack">
+            <h3>Java Full Stack Development</h3>
+            <p>Master Java, JSP, Servlets, and Spring Boot with hands-on projects.</p>
+            <a href="views/auth/register.jsp" class="btn-small">Enroll Now</a>
+        </div>
+        <div class="course-card">
+            <img src="views/assets/images/wd.jpg" alt="Web Development">
+            <h3>Frontend Web Development</h3>
+            <p>Learn HTML, CSS, and JavaScript to build stunning websites.</p>
+            <a href="views/auth/register.jsp" class="btn-small">Enroll Now</a>
+        </div>
+        <div class="course-card">
+            <img src="views/assets/images/ml.jpg" alt="Python Programming">
+            <h3>Python Programming</h3>
+            <p>Build a strong foundation in Python and automation.</p>
+            <a href="views/auth/register.jsp" class="btn-small">Enroll Now</a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta">
+    <h2>Start Your Learning Journey Today 🚀</h2>
+    <a href="views/auth/register.jsp" class="btn-primary">Get Started</a>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="footer-container">
+
+        <!-- Logo & About -->
+        <div class="footer-column">
+            <img src="views/assets/images/FD.jpeg" class="footer-logo" alt="FD Logo">
+            <p>Future Developers LMS — Empowering learners everywhere with technology, projects, and expert guidance.</p>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-column">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="index.jsp">Home</a></li>
+                <li><a href="views/courses.jsp">Courses</a></li>
+                <li><a href="views/about.jsp">About</a></li>
+                <li><a href="views/contact.jsp">Contact</a></li>
+            </ul>
+        </div>
+
+        <!-- Social Links -->
+        <div class="footer-column">
+            <h4>Follow Us</h4>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
             </div>
         </div>
 
-        <div class="cta-buttons">
-            <a href="${pageContext.request.contextPath}/views/auth/login.jsp" class="btn btn-login">Login</a>
-            <a href="${pageContext.request.contextPath}/views/auth/register.jsp" class="btn">Register</a>
-        </div>
-    </section>
-</main>
+    </div>
 
-<footer class="main-footer">
-    <p>&copy; 2025 Future Developers LMS | All Rights Reserved</p>
+    <div class="footer-bottom">
+        <p>© 2025 Future Developers LMS. All rights reserved.</p>
+    </div>
 </footer>
 
+
+<script src="views/assets/js/main.js"></script>
 </body>
 </html>

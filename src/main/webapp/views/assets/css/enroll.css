@@ -1,0 +1,103 @@
+/* ===== ENROLLMENT BANNER ===== */
+.enroll-banner {
+  background: linear-gradient(135deg, #eaf9f0, #f9fcf8);
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.enroll-banner h1 {
+  color: #1e874b;
+  font-size: 2.2rem;
+}
+
+.enroll-banner p {
+  color: #555;
+  margin-top: 0.6rem;
+  font-size: 1rem;
+}
+
+/* ===== ENROLLMENT FORM ===== */
+.enroll-section {
+  padding: 60px 20px;
+  background: #f7fbf8;
+  display: flex;
+  justify-content: center;
+}
+
+.enroll-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.enroll-form {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.enroll-form h2 {
+  text-align: center;
+  color: #1e874b;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.form-group i {
+  margin-right: 5px;
+  color: #27ae60;
+}
+
+input, select, textarea {
+  width: 100%;
+  border: 1.5px solid #d9e8dd;
+  border-radius: 10px;
+  padding: 0.7rem;
+  font-size: 0.95rem;
+  background: #f9fdf9;
+  outline: none;
+  transition: border 0.3s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #27ae60;
+  background: #ffffff;
+}
+
+textarea {
+  resize: none;
+}
+
+.btn.primary {
+  display: block;
+  width: 100%;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn.primary:hover {
+  background: #1e874b;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+  .enroll-form {
+    padding: 1.8rem;
+  }
+}

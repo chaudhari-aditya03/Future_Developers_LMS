@@ -1,0 +1,105 @@
+.profile-section {
+  padding: 50px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.profile-photo {
+  text-align: center;
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.profile-photo img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #27ae60;
+}
+
+.upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: calc(50% - 60px);
+  background: #27ae60;
+  color: white;
+  border-radius: 50%;
+  padding: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+
+.form-group i {
+  margin-right: 5px;
+  color: #27ae60;
+}
+
+input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1.5px solid #d9e8dd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #f9fdf9;
+  outline: none;
+  transition: border 0.3s;
+}
+
+input:focus {
+  border-color: #27ae60;
+  background: #ffffff;
+}
+
+hr {
+  border: 0.8px solid #e2e8e4;
+  margin: 1.2rem 0;
+}
+
+.btn.primary {
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn.primary:hover {
+  background: #1e874b;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-card {
+    padding: 1.5rem;
+  }
+}

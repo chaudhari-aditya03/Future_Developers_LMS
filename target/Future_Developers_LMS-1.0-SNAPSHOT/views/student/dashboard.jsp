@@ -1,181 +1,234 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="org.example.future_developers_lms.model.User" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="true" %>
+
+<%
+    // --- SESSION VALIDATION ---
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+        return;
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Student Dashboard | Future Developers LMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
+
+    <!-- Font & Icons -->
+    <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary-color: #1e90a1;
+            --sidebar-bg: #1e90a1;
+            --sidebar-hover: rgba(255, 255, 255, 0.15);
+            --sidebar-active: rgba(255, 255, 255, 0.25);
+            --main-bg: #f8fcfb;
+            --card-bg: #fff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
+            display: flex;
+            background: var(--main-bg);
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
         }
-        header {
-            background-color: #007bff;
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
             color: white;
-            padding: 1rem;
-            text-align: center;
+            height: 100vh;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .container {
+
+        .sidebar-header {
+            text-align: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .sidebar-logo {
+            height: 60px;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu li a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background: var(--sidebar-active);
+        }
+
+        .sidebar-footer {
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logout-btn {
+            background: #1e1e2f;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: #111;
+        }
+
+        /* ===== MAIN ===== */
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
             padding: 2rem;
         }
-        .section {
-            background-color: #fff;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        h2 {
-            margin-top: 0;
+
+        .dashboard-header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 0.5rem;
+
+        .profile-summary {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
+
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
         }
-        th {
-            background-color: #f4f4f4;
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
         }
-        a {
-            color: #007bff;
-            text-decoration: none;
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
         }
-        a:hover {
-            text-decoration: underline;
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
+
 <body>
 
-<header>
-    <h1>Welcome, ${sessionScope.user.fullName}</h1>
-    <p><a href="${pageContext.request.contextPath}/views/auth/logout.jsp.jsp">Logout</a></p>
-</header>
-
-<div class="container">
-
-    <!-- Courses Section -->
-    <div class="section">
-        <h2>Enrolled Courses</h2>
-        <c:if test="${empty courses}">
-            <p>No courses enrolled yet.</p>
-        </c:if>
-        <c:if test="${not empty courses}">
-            <table>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Description</th>
-                </tr>
-                <c:forEach var="course" items="${courses}">
-                    <tr>
-                        <td>${course.courseName}</td>
-                        <td>${course.description}</td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </c:if>
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="${pageContext.request.contextPath}/images/FD.jpeg" alt="Logo" class="sidebar-logo">
+        <h2>Future Developers</h2>
     </div>
 
-    <!-- Attendance Section -->
-    <div class="section">
-        <h2>Attendance</h2>
-        <c:if test="${empty attendanceMap}">
-            <p>No attendance records yet.</p>
-        </c:if>
-        <c:if test="${not empty attendanceMap}">
-            <table>
-                <tr>
-                    <th>Course Name</th>
-                    <th>Attendance %</th>
-                </tr>
-                <c:forEach var="course" items="${courses}">
-                    <tr>
-                        <td>${course.courseName}</td>
-                        <td>${attendanceMap[course.courseId]}</td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </c:if>
+    <ul class="sidebar-menu">
+        <li class="active"><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="courses.jsp"><i class="fas fa-book"></i> Courses</a></li>
+        <li><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
+        <li><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
+    </ul>
+
+    <div class="sidebar-footer">
+        <form action="${pageContext.request.contextPath}/LogoutServlet" method="post">
+            <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
     </div>
+</aside>
 
-    <!-- Tests Section -->
-    <div class="section">
-        <h2>Tests & Results</h2>
-        <c:if test="${empty testResults}">
-            <p>No test results yet.</p>
-        </c:if>
-        <c:if test="${not empty testResults}">
-            <table>
-                <tr>
-                    <th>Test Name</th>
-                    <th>Score</th>
-                    <th>Status</th>
-                </tr>
-                <c:forEach var="test" items="${testResults}">
-                    <tr>
-                        <td>${test.testName}</td>
-                        <td>${test.score}</td>
-                        <td>${test.status}</td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </c:if>
-    </div>
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main-content">
+    <header class="dashboard-header">
+        <h1>Welcome, <span><%= user.getFullName() %></span></h1>
+        <div class="profile-summary">
+            <img src="${pageContext.request.contextPath}/images/student-avatar.png" alt="Student" class="profile-avatar">
+            <div>
+                <p><strong>ID:</strong> <%= user.getUserId() %></p>
+                <p><strong>Email:</strong> <%= user.getEmail() %></p>
+                <p><strong>Role:</strong> <%= user.getRole() %></p>
+            </div>
+        </div>
+    </header>
 
-    <!-- Lectures Section -->
-    <div class="section">
-        <h2>Lectures</h2>
-        <c:if test="${empty lectures}">
-            <p>No lectures available.</p>
-        </c:if>
-        <c:if test="${not empty lectures}">
-            <table>
-                <tr>
-                    <th>Title</th>
-                    <th>Date</th>
-                    <th>Action</th>
-                </tr>
-                <c:forEach var="lecture" items="${lectures}">
-                    <tr>
-                        <td>${lecture.title}</td>
-                        <td>${lecture.date}</td>
-                        <td><a href="${lecture.videoLink}">Watch</a></td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </c:if>
-    </div>
+    <section class="dashboard-cards">
+        <div class="card"><i class="fas fa-book"></i><h3>3</h3><p>Enrolled Courses</p></div>
+        <div class="card"><i class="fas fa-play-circle"></i><h3>12</h3><p>Completed Lectures</p></div>
+        <div class="card"><i class="fas fa-chart-pie"></i><h3>92%</h3><p>Attendance</p></div>
+        <div class="card"><i class="fas fa-calendar-check"></i><h3>2</h3><p>Upcoming Tests</p></div>
+    </section>
+</main>
 
-    <!-- Notes Section -->
-    <div class="section">
-        <h2>Notes</h2>
-        <c:if test="${empty notes}">
-            <p>No notes available.</p>
-        </c:if>
-        <c:if test="${not empty notes}">
-            <table>
-                <tr>
-                    <th>Title</th>
-                    <th>Download</th>
-                </tr>
-                <c:forEach var="note" items="${notes}">
-                    <tr>
-                        <td>${note.title}</td>
-                        <td><a href="${note.filePath}">Download</a></td>
-                    </tr>
-                </c:forEach>
-            </table>
-        </c:if>
-    </div>
-
-</div>
-
+<script>
+    document.querySelectorAll('.sidebar-menu li').forEach(item => {
+        item.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-menu li').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>

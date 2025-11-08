@@ -6,11 +6,9 @@ import org.example.future_developers_lms.util.DBConnection;
 
 public class UserDAO {
 
-//checks registration
-    public boolean registerUserBasic(User user) {
-        boolean isInserted = false;
+    // Register a new user
+    public boolean registerUser(User user) {
         String sql = "INSERT INTO users (full_name, email, password, role) VALUES (?, ?, ?, ?)";
-
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -20,18 +18,16 @@ public class UserDAO {
             ps.setString(4, user.getRole());
 
             int rows = ps.executeUpdate();
-            isInserted = (rows > 0);
+            return rows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return isInserted;
     }
 
-    // Login check
+    //  Login user by credentials
     public User loginUser(String email, String password, String role) {
-        User user = null;
-        String sql = "SELECT * FROM users WHERE email = ? AND password = ? AND role = ?";
-
+        String sql = "SELECT * FROM users WHERE email=? AND password=? AND role=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -41,41 +37,45 @@ public class UserDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                user = new User();
+                User user = new User();
                 user.setUserId(rs.getInt("user_id"));
                 user.setFullName(rs.getString("full_name"));
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
+                return user;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return user;
+        return null;
     }
-    // Forgot password (update password)
+
+    //  Update password
     public boolean updatePassword(String email, String newPassword) {
         String sql = "UPDATE users SET password=? WHERE email=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, newPassword);
             ps.setString(2, email);
             int rows = ps.executeUpdate();
             return rows > 0;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    // Check if email exists
+    //  Check if email already exists
     public boolean isEmailExists(String email) {
-        String sql = "SELECT email FROM users WHERE email=?";
+        String sql = "SELECT 1 FROM users WHERE email=?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
             return rs.next();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }

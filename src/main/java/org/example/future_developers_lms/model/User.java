@@ -1,5 +1,7 @@
 package org.example.future_developers_lms.model;
 
+import java.sql.Timestamp;
+
 public class User {
     private int userId;
     private String fullName;
@@ -11,6 +13,7 @@ public class User {
     private String phone;
     private String address;
     private String profilePhoto;
+    private Timestamp createdAt;
 
     public User()
     {
@@ -30,6 +33,9 @@ public class User {
         this.profilePhoto = profilePhoto;
     }
     // Getters and Setters
+
+    public Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 

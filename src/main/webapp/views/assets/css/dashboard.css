@@ -1,0 +1,353 @@
+/* ===== ROOT VARIABLES (ENHANCED WITH COLORS) ===== */
+:root {
+    --primary-color: #1e90a1;
+    --primary-dark: #166c7a;
+    --primary-light: #e0f7f5;
+    --sidebar-bg: #1e90a1;
+    --sidebar-hover: rgba(255, 255, 255, 0.15);
+    --sidebar-active: rgba(255, 255, 255, 0.25);
+
+    --text-dark: #1f2937;
+    --text-light: #fff;
+    --text-muted: #6b7280;
+    --main-bg: #f8fcfb;
+    --card-bg: #fff;
+    --border-light: #eef;
+
+    /* ===== NEW: STYLISH COLOR PALETTE ===== */
+    --color-info: #3498db;          /* Blue */
+    --color-success: #2ecc71;        /* Green */
+    --color-warning: #f39c12;        /* Orange */
+    --color-accent: #9b59b6;         /* Purple */
+
+    /* ===== NEW: Light versions for backgrounds ===== */
+    --color-info-light: #eaf3fb;
+    --color-success-light: #eaf7ec;
+    --color-warning-light: #fef8e7;
+    --color-accent-light: #f4ecf7;
+
+    /* Modern, layered shadows */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 25px rgba(0,0,0,0.12);
+
+    /* Standard transitions */
+    --transition-fast: all 0.2s ease-in-out;
+    --transition-main: all 0.3s ease;
+}
+
+body {
+    display: flex;
+    background: var(--main-bg);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-dark);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== SIDEBAR (No changes) ===== */
+.sidebar {
+    width: 250px;
+    background: var(--sidebar-bg);
+    color: white;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+    z-index: 100;
+}
+.sidebar-header {
+    text-align: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.sidebar-logo {
+    height: 60px;
+    border-radius: 8px;
+    transition: var(--transition-main);
+}
+.sidebar-logo:hover {
+    transform: scale(1.05) rotate(3deg);
+}
+.sidebar-menu {
+    list-style: none;
+    padding: 1rem;
+    flex-grow: 1;
+}
+.sidebar-menu li {
+    margin-bottom: 5px;
+    border-radius: 6px;
+}
+.sidebar-menu li a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: var(--transition-fast);
+}
+.sidebar-menu li a:hover {
+    background: var(--sidebar-hover);
+    transform: translateX(5px);
+}
+.sidebar-menu li.active a {
+    background: var(--sidebar-active);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--text-light);
+}
+.sidebar-footer {
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+.logout-btn {
+    background: var(--primary-dark);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition-main);
+}
+.logout-btn:hover {
+    background: var(--text-light);
+    color: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 2rem;
+    transition: var(--transition-main);
+}
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 1.5rem;
+}
+.dashboard-header h1 {
+    color: var(--text-dark);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+.dashboard-header h1 span {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+.profile-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--card-bg);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid var(--primary-light);
+    /* ===== NEW: Added transition ===== */
+    transition: var(--transition-main);
+}
+/* ===== NEW: Added hover effect to avatar ===== */
+.profile-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+}
+
+
+/* ===== DASHBOARD CARDS (HEAVILY STYLED) ===== */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+.card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-main);
+    /* ===== NEW: Set a default glow color variable ===== */
+    --card-glow-color: var(--primary-color);
+}
+.card:hover {
+    transform: translateY(-8px);
+    /* ===== UPDATED: Creates a "glow" shadow using the card's specific color ===== */
+    box-shadow: 0 10px 25px rgba(var(--card-glow-color), 0.25);
+}
+
+/* ===== UPDATED: Removed color here, will be set individually ===== */
+.card i {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+.card h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.2rem 0;
+}
+.card p {
+    color: var(--text-muted);
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ===== NEW: Apply unique colors to each card ===== */
+.card:nth-child(1) { --card-glow-color: var(--color-info); }
+.card:nth-child(1) i, .card:nth-child(1) h3 { color: var(--color-info); }
+
+.card:nth-child(2) { --card-glow-color: var(--color-success); }
+.card:nth-child(2) i, .card:nth-child(2) h3 { color: var(--color-success); }
+
+.card:nth-child(3) { --card-glow-color: var(--color-warning); }
+.card:nth-child(3) i, .card:nth-child(3) h3 { color: var(--color-warning); }
+
+.card:nth-child(4) { --card-glow-color: var(--color-accent); }
+.card:nth-child(4) i, .card:nth-child(4) h3 { color: var(--color-accent); }
+
+
+/* ===== QUICK LINKS (STYLED) ===== */
+.quick-links {
+    margin-top: 3rem;
+}
+.quick-links h2 {
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 0.5rem;
+}
+.link-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.5rem;
+}
+.link-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--card-bg);
+    padding: 1.2rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--text-dark); /* Dark text by default */
+    font-weight: 600;
+    transition: var(--transition-main);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+}
+
+/* ===== UPDATED: Removed generic hover, will be set individually ===== */
+.link-card:hover {
+    color: var(--text-light); /* White text on hover */
+    transform: scale(1.03);
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== NEW: Apply unique hover colors to quick links ===== */
+.link-card:nth-child(1):hover { background: var(--color-info); }
+.link-card:nth-child(2):hover { background: var(--color-info); }
+.link-card:nth-child(3):hover { background: var(--color-success); }
+.link-card:nth-child(4):hover { background: var(--color-accent); }
+.link-card:nth-child(5):hover { background: var(--color-warning); }
+.link-card:nth-child(6):hover { background: var(--color-success); }
+
+
+/* ===== RECENT NOTES (STYLED) ===== */
+.recent-section {
+    margin-top: 3rem;
+}
+.recent-section h2 {
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-light);
+    padding-bottom: 0.5rem;
+}
+.notes-list {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    list-style: none;
+}
+.notes-list li {
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition-fast);
+}
+.notes-list li:last-child {
+    border-bottom: none;
+}
+.notes-list li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    text-decoration: none;
+    color: var(--text-dark);
+}
+/* ===== NEW: Added an icon before each note title ===== */
+.notes-list li a::before {
+    content: '\f15b'; /* FontAwesome file icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 600;
+    color: var(--color-info);
+    margin-right: 12px;
+    transition: var(--transition-fast);
+}
+.notes-list li:hover {
+    background-color: var(--main-bg);
+}
+.notes-list li a:hover::before {
+    color: var(--primary-dark);
+}
+.notes-list li strong {
+    font-weight: 600;
+    /* ===== UPDATED: Use a theme color ===== */
+    color: var(--color-info);
+    transition: var(--transition-fast);
+}
+.notes-list li a:hover strong {
+    color: var(--primary-dark);
+}
+.notes-list li .note-time {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .sidebar {
+        display: none;
+    }
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}

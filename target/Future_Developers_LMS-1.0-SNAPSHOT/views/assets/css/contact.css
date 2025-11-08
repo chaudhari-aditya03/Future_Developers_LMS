@@ -1,0 +1,144 @@
+/* ===== CONTACT BANNER ===== */
+.contact-banner {
+  background: linear-gradient(135deg, #eaf9f0, #f9fcf8);
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.contact-banner h1 {
+  color: #1e874b;
+  font-size: 2.2rem;
+}
+
+.contact-banner p {
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+/* ===== CONTACT INFO ===== */
+.contact-info {
+  padding: 60px 20px;
+  background: #f7fbf8;
+  text-align: center;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
+}
+
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+}
+
+.info-card i {
+  color: #27ae60;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.info-card h3 {
+  color: #1e874b;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== CONTACT FORM ===== */
+.contact-form-section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.contact-container {
+  max-width: 600px;
+  margin: auto;
+}
+
+.contact-form {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 2.5rem;
+}
+
+.contact-form h2 {
+  color: #1e874b;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.form-group i {
+  margin-right: 5px;
+  color: #27ae60;
+}
+
+input, textarea {
+  width: 100%;
+  border: 1.5px solid #d9e8dd;
+  border-radius: 10px;
+  padding: 0.7rem;
+  font-size: 0.95rem;
+  background: #f9fdf9;
+  outline: none;
+  transition: border 0.3s;
+}
+
+input:focus, textarea:focus {
+  border-color: #27ae60;
+  background: #ffffff;
+}
+
+.btn.primary {
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn.primary:hover {
+  background: #1e874b;
+}
+
+/* ===== MAP SECTION ===== */
+.map-section {
+  padding: 60px 20px;
+  text-align: center;
+  background: #f4faf6;
+}
+
+.map-placeholder {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .contact-form {
+    padding: 1.8rem;
+  }
+}
