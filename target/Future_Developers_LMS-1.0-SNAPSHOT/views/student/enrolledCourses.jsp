@@ -1,208 +1,199 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.*, org.example.future_developers_lms.model.Course" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, org.example.future_developers_lms.model.Course, org.example.future_developers_lms.model.User" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="true" %>
+
 <%
-    // Simulate data (replace with CourseService / DAO integration)
-    List<Course> enrolledCourses = (List<Course>) request.getAttribute("enrolledCourses");
-    if (enrolledCourses == null) {
-        enrolledCourses = new ArrayList<>();
-//        enrolledCourses.add(new Course("Java Full Stack Development", "Mr. Smith", "In Progress"));
-//        enrolledCourses.add(new Course("Python for Beginners", "Ms. Johnson", "Completed"));
-//        enrolledCourses.add(new Course("Frontend Development (HTML/CSS/JS)", "Mr. Brown", "In Progress"));
+    // ---- SESSION VALIDATION ----
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"STUDENT".equalsIgnoreCase(user.getRole())) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+        return;
     }
+
+    List<Course> enrolledCourses = (List<Course>) request.getAttribute("enrolledCourses");
 %>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Courses | Future Developers LMS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        /* ===== BASE STYLING ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { display: flex; min-height: 100vh; background: #f5f6fa; color: #333; }
+        :root {
+            --primary-color: #1e90a1;
+            --sidebar-bg: #1e90a1;
+            --sidebar-active: rgba(255, 255, 255, 0.25);
+            --main-bg: #f8fcfb;
+            --card-bg: #fff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            display: flex;
+            background: var(--main-bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-            color: #fff;
+            width: 250px;
+            background: var(--sidebar-bg);
+            color: white;
+            height: 100vh;
+            position: fixed;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: fixed;
-            height: 100%;
-            padding-top: 20px;
-            transition: width 0.3s;
         }
 
         .sidebar-header {
             text-align: center;
-            padding: 10px 0;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
 
         .sidebar-logo {
-            width: 65px;
-            border-radius: 50%;
-            margin-bottom: 10px;
-        }
-
-        .sidebar h2 {
-            font-size: 18px;
-            letter-spacing: 0.5px;
-            color: #fff;
+            height: 60px;
+            border-radius: 8px;
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 20px 0;
+            padding: 1rem;
         }
 
-        .sidebar-menu li { margin: 8px 0; }
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
 
-        .sidebar-menu a {
+        .sidebar-menu li a {
+            color: white;
             text-decoration: none;
-            color: #dcdde1;
             display: flex;
             align-items: center;
-            padding: 10px 25px;
-            transition: all 0.3s;
-            font-weight: 500;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s;
         }
 
-        .sidebar-menu a i {
-            margin-right: 12px;
-            font-size: 16px;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu .active a {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border-left: 4px solid #00bcd4;
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background: var(--sidebar-active);
         }
 
         .sidebar-footer {
             text-align: center;
-            padding: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
         }
 
         .logout-btn {
-            background: #e74c3c;
-            color: #fff;
+            background: #1e1e2f;
+            color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 0.6rem 1.2rem;
             border-radius: 25px;
             cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
         }
 
         .logout-btn:hover {
-            background: #c0392b;
+            background: #111;
         }
 
-        /* ===== MAIN CONTENT ===== */
+        /* ===== MAIN ===== */
         .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 30px 40px;
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 2rem;
         }
 
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
         }
 
         .dashboard-header h1 {
-            font-size: 26px;
-            font-weight: 600;
-            color: #1e3c72;
+            color: var(--primary-color);
+            font-size: 1.8rem;
         }
 
         .btn-primary {
-            background: #00bcd4;
+            background: var(--primary-color);
             border: none;
-            color: #fff;
-            padding: 10px 20px;
             border-radius: 25px;
-            cursor: pointer;
+            padding: 10px 20px;
+            color: white;
             font-weight: 500;
-            transition: background 0.3s;
         }
 
         .btn-primary:hover {
-            background: #0192a2;
+            background: #157e8f;
         }
 
-        /* ===== COURSES ===== */
-        .courses-section h2 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: #2a5298;
-        }
-
+        /* ===== COURSE CARDS ===== */
         .courses-grid {
+            margin-top: 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
         }
 
         .course-card {
-            background: #fff;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s;
         }
 
         .course-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 14px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
         }
 
         .course-card h3 {
             font-size: 18px;
-            margin-bottom: 10px;
-            color: #1e3c72;
+            color: var(--primary-color);
         }
 
         .course-card p {
+            margin: 4px 0;
             font-size: 14px;
-            margin: 5px 0;
-            color: #555;
         }
 
         .btn-secondary {
-            background: #2a5298;
+            background: var(--primary-color);
             color: #fff;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.3s;
+            margin-top: 8px;
         }
 
         .btn-secondary:hover {
-            background: #00bcd4;
+            background: #147382;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media(max-width: 768px) {
-            .sidebar { width: 200px; }
-            .main-content { margin-left: 200px; padding: 25px; }
-        }
-
-        @media(max-width: 600px) {
+        @media (max-width: 992px) {
             .sidebar { display: none; }
-            .main-content { margin: 0; padding: 20px; }
+            .main-content { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
@@ -212,24 +203,24 @@
 <!-- ===== SIDEBAR ===== -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <img src="../images/FD.jpeg" alt="Logo" class="sidebar-logo">
+        <img src="${pageContext.request.contextPath}/images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
+        <p style="font-size: 14px;">Welcome, <%= user.getFullName() %></p>
     </div>
+
     <ul class="sidebar-menu">
-        <li><a href="<%= request.getContextPath() %>/DashboardServlet"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="<%= request.getContextPath() %>/ProfileServlet"><i class="fas fa-user"></i> Profile</a></li>
-        <li class="active"><a href="<%= request.getContextPath() %>/CourseServlet?action=enrolled"><i class="fas fa-book"></i> Courses</a></li>
-        <li><a href="<%= request.getContextPath() %>/LectureServlet"><i class="fas fa-video"></i> Lectures</a></li>
-        <li><a href="<%= request.getContextPath() %>/AttendanceServlet"><i class="fas fa-check-circle"></i> Attendance</a></li>
-        <li><a href="<%= request.getContextPath() %>/NotesServlet"><i class="fas fa-file-alt"></i> Notes</a></li>
-        <li><a href="<%= request.getContextPath() %>/TestServlet"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="<%= request.getContextPath() %>/PaymentServlet"><i class="fas fa-wallet"></i> Payments</a></li>
-        <li><a href="<%= request.getContextPath() %>/ProgressServlet"><i class="fas fa-chart-line"></i> Progress</a></li>
-        <li><a href="<%= request.getContextPath() %>/FeedbackServlet"><i class="fas fa-comment-dots"></i> Feedback</a></li>
+        <li><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li class="active"><a href="courses.jsp"><i class="fas fa-book"></i> Courses</a></li>
+        <li><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
+        <li><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
     </ul>
 
     <div class="sidebar-footer">
-        <form action="<%= request.getContextPath() %>/LogoutServlet" method="post">
+        <form action="${pageContext.request.contextPath}/LogoutServlet" method="post">
             <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </form>
     </div>
@@ -239,28 +230,32 @@
 <main class="main-content">
     <header class="dashboard-header">
         <h1>My Courses</h1>
-        <form action="<%= request.getContextPath() %>/CourseServlet" method="get">
+        <form action="${pageContext.request.contextPath}/CourseServlet" method="get">
             <input type="hidden" name="action" value="all">
             <button class="btn-primary" type="submit">Enroll in New Course</button>
         </form>
     </header>
 
-    <section class="courses-section">
-        <h2>Enrolled Courses</h2>
-        <div class="courses-grid">
-            <% for (Course c : enrolledCourses) { %>
-<%--            <div class="course-card">--%>
-<%--                <h3><%= c.getCourseName()%></h3>--%>
-<%--                <p><strong>Instructor:</strong> <%= c.getInstructor() %></p>--%>
-<%--                <p><strong>Status:</strong> <%= c.getStatus() %></p>--%>
-<%--                <form action="<%= request.getContextPath() %>/CourseServlet" method="post">--%>
-<%--                    <input type="hidden" name="action" value="unenroll">--%>
-<%--                    <input type="hidden" name="courseName" value="<%= c.getCourseName() %>">--%>
-<%--                    <button class="btn-secondary" type="submit">Unenroll</button>--%>
-<%--                </form>--%>
-<%--            </div>--%>
-            <% } %>
-        </div>
+    <section class="courses-grid">
+        <c:choose>
+            <c:when test="${not empty enrolledCourses}">
+                <c:forEach var="course" items="${enrolledCourses}">
+                    <div class="course-card">
+                        <h3>${course.courseName}</h3>
+                        <p><strong>Instructor:</strong> ${course.instructor}</p>
+                        <p><strong>Status:</strong> ${course.status}</p>
+                        <form action="${pageContext.request.contextPath}/CourseServlet" method="post">
+                            <input type="hidden" name="action" value="unenroll">
+                            <input type="hidden" name="courseId" value="${course.courseId}">
+                            <button class="btn-secondary" type="submit">Unenroll</button>
+                        </form>
+                    </div>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <p>No enrolled courses found.</p>
+            </c:otherwise>
+        </c:choose>
     </section>
 </main>
 

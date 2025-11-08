@@ -27,4 +27,17 @@ public class Attendance {
 
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+
+
+    public boolean getCourseName() {
+        return false;
+    }
+
+    public boolean getLectureDate() {
+        return false;
+    }
+
+    public String getRemarks() {
+        return null;
+    }
 }

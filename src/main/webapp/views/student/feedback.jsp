@@ -1,14 +1,20 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%--<%@ page import="java.util.*, com.myclassportal.model.Feedback" %>--%>
-<%--<%--%>
-<%--    // Example data (replace with actual DAO/Service)--%>
-<%--    List<Feedback> feedbackList = (List<Feedback>) request.getAttribute("feedbackList");--%>
-<%--    if (feedbackList == null) {--%>
-<%--        feedbackList = new ArrayList<>();--%>
-<%--        feedbackList.add(new Feedback("Issue with Lecture Video", "The video on Spring Boot REST API is not playing.", "Pending", "2 days ago"));--%>
-<%--        feedbackList.add(new Feedback("Course Material Request", "Please upload more practice PDFs for Java OOPs.", "Resolved", "1 week ago"));--%>
-<%--    }--%>
-<%--%>--%>
+<%@ page import="java.util.*, org.example.future_developers_lms.model.CourseFeedback, org.example.future_developers_lms.model.User" %>
+<%@ page import="org.example.future_developers_lms.model.CourseFeedback" %>
+
+<%
+    // ===== SESSION VALIDATION =====
+    HttpSession sessionUser = request.getSession(false);
+    User user = null;
+    if (sessionUser == null || (user = (User) sessionUser.getAttribute("user")) == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+        return;
+    }
+
+    // ===== FETCH FEEDBACK LIST FOR THIS STUDENT =====
+    List<CourseFeedback> feedbackList = (List<CourseFeedback>) request.getAttribute("feedbackList");
+    if (feedbackList == null) feedbackList = new ArrayList<>();
+%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,227 +22,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback | Future Developers LMS</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
 
     <style>
+        :root {
+            --primary: #1e90a1;
+            --sidebar-bg: #1e90a1;
+            --main-bg: #f8fcfb;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { display: flex; background: #f4f6fb; color: #333; min-height: 100vh; }
+        body { display: flex; background: var(--main-bg); color: #333; min-height: 100vh; }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
-            width: 260px;
-            background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
+            width: 250px;
+            background: var(--sidebar-bg);
             color: #fff;
+            height: 100vh;
+            position: fixed;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: fixed;
-            height: 100%;
-            padding-top: 20px;
         }
-
-        .sidebar-header {
-            text-align: center;
-        }
-
-        .sidebar-logo {
-            width: 65px;
-            border-radius: 50%;
-            margin-bottom: 8px;
-        }
-
-        .sidebar h2 {
-            font-size: 18px;
-            color: #fff;
-            letter-spacing: 0.5px;
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 20px 0;
-        }
-
-        .sidebar-menu li { margin: 8px 0; }
-
+        .sidebar-header { text-align: center; padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .sidebar-logo { height: 60px; border-radius: 8px; }
+        .sidebar-menu { list-style: none; padding: 1rem; }
+        .sidebar-menu li { margin-bottom: 5px; }
         .sidebar-menu a {
             text-decoration: none;
-            color: #dcdde1;
+            color: white;
             display: flex;
             align-items: center;
-            padding: 10px 25px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .sidebar-menu a i {
-            margin-right: 10px;
-            font-size: 16px;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu .active a {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border-left: 4px solid #00bcd4;
-        }
-
-        .sidebar-footer {
-            text-align: center;
-            padding: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .logout-btn {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
             padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.3s;
+            border-radius: 8px;
         }
-
-        .logout-btn:hover {
-            background: #c0392b;
+        .sidebar-menu li.active a,
+        .sidebar-menu a:hover { background: rgba(255,255,255,0.2); }
+        .logout-btn {
+            background: #111;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            cursor: pointer;
         }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            margin-left: 260px;
-            padding: 30px 40px;
-            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
         }
-
         .dashboard-header h1 {
-            font-size: 26px;
+            color: var(--primary);
+            font-size: 1.8rem;
             font-weight: 600;
-            color: #1e3c72;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
 
         /* ===== FEEDBACK FORM ===== */
         .feedback-section {
             background: #fff;
-            padding: 25px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            transition: 0.3s ease;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
         }
-
-        .feedback-section:hover {
-            transform: translateY(-3px);
-        }
-
         .feedback-section h2 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: #2a5298;
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
         }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            font-weight: 500;
-            margin-bottom: 6px;
-            display: block;
-            color: #333;
-        }
-
+        .form-group { margin-bottom: 1rem; }
+        label { font-weight: 500; color: #444; display: block; margin-bottom: 5px; }
         input[type="text"], textarea {
             width: 100%;
             padding: 10px;
+            border-radius: 8px;
             border: 1px solid #ccc;
-            border-radius: 10px;
-            outline: none;
-            transition: border-color 0.3s;
+            font-family: inherit;
         }
-
-        input[type="text"]:focus,
-        textarea:focus {
-            border-color: #00bcd4;
-        }
-
+        textarea { resize: vertical; }
         .btn-submit {
-            align-self: flex-start;
-            background: #00bcd4;
+            background: var(--primary);
             color: #fff;
             border: none;
-            padding: 10px 20px;
             border-radius: 25px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-weight: 500;
             transition: background 0.3s;
         }
-
-        .btn-submit:hover {
-            background: #0192a2;
-        }
+        .btn-submit:hover { background: #147c8c; }
 
         /* ===== FEEDBACK LIST ===== */
         .feedback-list {
-            list-style: none;
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
-        .feedback-list li {
+        .feedback-item {
+            border-left: 5px solid var(--primary);
             background: #f9f9f9;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 5px solid #1e3c72;
-            transition: transform 0.3s ease;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
         }
-
-        .feedback-list li:hover {
-            transform: translateX(4px);
-        }
-
-        .feedback-list strong {
-            color: #2a5298;
-        }
-
+        .feedback-item strong { color: var(--primary); }
         .status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 3px 8px;
-            border-radius: 12px;
         }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.resolved { background: #d4edda; color: #155724; }
 
-        .status.pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status.resolved {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        small {
-            color: #777;
-            font-size: 13px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media(max-width: 768px) {
-            .sidebar { width: 200px; }
-            .main-content { margin-left: 200px; padding: 20px; }
-        }
-
-        @media(max-width: 600px) {
+        @media(max-width: 992px) {
             .sidebar { display: none; }
-            .main-content { margin: 0; padding: 20px; }
+            .main-content { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
+
 <body>
 
 <!-- ===== SIDEBAR ===== -->
@@ -244,21 +155,21 @@
     <div class="sidebar-header">
         <img src="../images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
+        <p style="font-size: 14px;">Welcome, <%= user.getFullName() %></p>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="<%= request.getContextPath() %>/DashboardServlet"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="<%= request.getContextPath() %>/ProfileServlet"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="<%= request.getContextPath() %>/CourseServlet?action=enrolled"><i class="fas fa-book"></i> Courses</a></li>
-        <li><a href="<%= request.getContextPath() %>/LectureServlet"><i class="fas fa-video"></i> Lectures</a></li>
-        <li><a href="<%= request.getContextPath() %>/AttendanceServlet"><i class="fas fa-check-circle"></i> Attendance</a></li>
-        <li><a href="<%= request.getContextPath() %>/NotesServlet"><i class="fas fa-file-alt"></i> Notes</a></li>
-        <li><a href="<%= request.getContextPath() %>/TestServlet"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="<%= request.getContextPath() %>/PaymentServlet"><i class="fas fa-wallet"></i> Payments</a></li>
-        <li><a href="<%= request.getContextPath() %>/ProgressServlet"><i class="fas fa-chart-line"></i> Progress</a></li>
-        <li class="active"><a href="<%= request.getContextPath() %>/FeedbackServlet"><i class="fas fa-comment-dots"></i> Feedback</a></li>
+        <li><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="enrolledCourses.jsp"><i class="fas fa-book"></i> Courses</a></li>
+        <li><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
+        <li><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
+        <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
+        <li class="active"><a href="feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
     </ul>
-
-    <div class="sidebar-footer">
+    <div class="sidebar-footer text-center">
         <form action="<%= request.getContextPath() %>/LogoutServlet" method="post">
             <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </form>
@@ -271,7 +182,7 @@
         <h1>Feedback & Support</h1>
     </header>
 
-    <!-- Submit Feedback -->
+    <!-- ===== NEW FEEDBACK FORM ===== -->
     <section class="feedback-section">
         <h2>Submit New Feedback</h2>
         <form action="<%= request.getContextPath() %>/FeedbackServlet" method="post">
@@ -281,29 +192,30 @@
             </div>
             <div class="form-group">
                 <label for="message">Message</label>
-                <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+                <textarea id="message" name="message" rows="4" placeholder="Describe your issue or suggestion..." required></textarea>
             </div>
             <button type="submit" class="btn-submit">Submit Feedback</button>
         </form>
     </section>
 
-    <!-- Previous Feedback -->
-    <section class="feedback-section">
-        <h2>Previous Feedback</h2>
-        <ul class="feedback-list">
-<%--            <% for (Feedback f : feedbackList) { %>--%>
-<%--            <li>--%>
-<%--                <p><strong>Subject:</strong> <%= f.getSubject() %></p>--%>
-<%--                <p><strong>Message:</strong> <%= f.getMessage() %></p>--%>
-<%--                <p><strong>Status:</strong>--%>
-<%--                    <span class="status <%= f.getStatus().equalsIgnoreCase("Pending") ? "pending" : "resolved" %>">--%>
-<%--                            <%= f.getStatus() %>--%>
-<%--                        </span>--%>
-<%--                </p>--%>
-<%--                <p><small>Submitted: <%= f.getSubmittedDate() %></small></p>--%>
-<%--            </li>--%>
-<%--            <% } %>--%>
-        </ul>
+    <!-- ===== FEEDBACK LIST ===== -->
+    <section class="feedback-list">
+        <h2>Your Previous Feedback</h2>
+        <% if (feedbackList.isEmpty()) { %>
+        <p class="text-muted mt-3">You haven’t submitted any feedback yet.</p>
+        <% } else {
+            for (CourseFeedback f : feedbackList) { %>
+        <div class="feedback-item">
+            <p><strong>Subject:</strong> <%= f.getSubject() %></p>
+            <p><strong>Message:</strong> <%= f.getMessage() %></p>
+            <p><strong>Status:</strong>
+                <span class="status <%= f.getStatus().equalsIgnoreCase("Pending") ? "pending" : "resolved" %>">
+                            <%= f.getStatus() %>
+                        </span>
+            </p>
+            <small>Submitted on: <%= f.getSubmittedDate() %></small>
+        </div>
+        <% } } %>
     </section>
 </main>
 </body>

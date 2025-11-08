@@ -1,4 +1,28 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*, org.example.future_developers_lms.model.Attendance, org.example.future_developers_lms.model.User" %>
+
+<%
+    // ===== SESSION VALIDATION =====
+    HttpSession sessionUser = request.getSession(false);
+    User user = null;
+    if (sessionUser == null || (user = (User) sessionUser.getAttribute("user")) == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+        return;
+    }
+
+    // ===== FETCH ATTENDANCE FOR THIS STUDENT =====
+    List<Attendance> attendanceList = (List<Attendance>) request.getAttribute("attendanceList");
+    if (attendanceList == null) attendanceList = new ArrayList<>();
+
+    // ===== CALCULATE OVERALL PERCENTAGE =====
+    int totalLectures = attendanceList.size();
+    int attended = 0;
+    for (Attendance a : attendanceList) {
+        if ("PRESENT".equalsIgnoreCase(a.getStatus())) attended++;
+    }
+    int overallPercent = totalLectures > 0 ? (int) ((attended * 100.0) / totalLectures) : 0;
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,24 +30,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Attendance | Future Developers LMS</title>
 
-    <!-- Bootstrap + Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
+    <!-- Bootstrap & Fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
 
     <style>
         :root {
             --primary: #1e90a1;
-            --bg-main: #f9fbfd;
             --sidebar-bg: #1e90a1;
-            --text-dark: #1f2937;
-            --text-light: #fff;
+            --main-bg: #f9fbfd;
         }
-
         body {
             display: flex;
             font-family: 'Poppins', sans-serif;
-            background: var(--bg-main);
+            background: var(--main-bg);
             margin: 0;
         }
 
@@ -31,13 +52,12 @@
         .sidebar {
             width: 250px;
             background: var(--sidebar-bg);
-            color: white;
+            color: #fff;
             height: 100vh;
             position: fixed;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            overflow-y: auto;
         }
 
         .sidebar-header {
@@ -45,76 +65,43 @@
             padding: 1.5rem 0;
             border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-
         .sidebar-logo {
             height: 60px;
             border-radius: 8px;
         }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 1rem;
-        }
-
-        .sidebar-menu li {
-            margin-bottom: 5px;
-        }
-
-        .sidebar-menu li a {
-            color: white;
+        .sidebar-menu { list-style: none; padding: 1rem; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            color: white;
             padding: 10px 20px;
+            display: block;
             border-radius: 8px;
-            transition: background 0.3s;
         }
-
-        .sidebar-menu li a:hover,
-        .sidebar-menu li.active a {
+        .sidebar-menu li.active a,
+        .sidebar-menu a:hover {
             background: rgba(255, 255, 255, 0.2);
         }
-
-        .sidebar-footer {
-            text-align: center;
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
         .logout-btn {
-            background: #1b1b2f;
+            background: #111;
             color: white;
             border: none;
-            padding: 0.6rem 1.2rem;
             border-radius: 25px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: 0.3s;
         }
-
-        .logout-btn:hover {
-            background: #111;
-        }
-
-        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 250px;
-            width: calc(100% - 250px);
             padding: 2rem;
+            width: calc(100% - 250px);
         }
 
-        .dashboard-header h1 {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.8rem;
-        }
-
-        /* ===== OVERALL ATTENDANCE CIRCLE ===== */
+        /* ===== ATTENDANCE ===== */
         .progress-circle {
             width: 150px;
             height: 150px;
             border-radius: 50%;
-            background: conic-gradient(var(--primary) 0% 88%, #e0e0e0 88% 100%);
+            background: conic-gradient(var(--primary) 0% <%= overallPercent %>%, #e0e0e0 <%= overallPercent %>% 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -124,61 +111,30 @@
 
         .progress-circle span {
             position: absolute;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 600;
-            color: var(--text-dark);
+            color: #333;
         }
 
-        /* ===== COURSE ATTENDANCE ===== */
-        .course-card {
-            background: linear-gradient(135deg, #89f7fe, #66a6ff);
-            color: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: transform 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .course-card:nth-child(2) {
-            background: linear-gradient(135deg, #f6d365, #fda085);
-        }
-
-        .course-card:nth-child(3) {
-            background: linear-gradient(135deg, #84fab0, #8fd3f4);
-        }
-
-        .course-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .progress-bar {
-            height: 10px;
-            background: rgba(255,255,255,0.4);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress {
-            height: 10px;
+        .attendance-table {
+            margin-top: 2rem;
             background: #fff;
-            border-radius: 5px;
-            width: 0;
-            transition: width 1.5s ease-in-out;
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .btn-primary {
+        th {
             background: var(--primary);
-            border: none;
-            border-radius: 30px;
-            padding: 0.7rem 1.5rem;
-            margin-top: 1.5rem;
-            transition: 0.3s;
+            color: white;
         }
-
-        .btn-primary:hover {
-            background: #147c8c;
+        .status-present {
+            color: green;
+            font-weight: 600;
+        }
+        .status-absent {
+            color: red;
+            font-weight: 600;
         }
 
         @media (max-width: 992px) {
@@ -187,102 +143,73 @@
         }
     </style>
 </head>
-<body>
 
+<body>
 <!-- ===== SIDEBAR ===== -->
 <aside class="sidebar">
     <div class="sidebar-header">
         <img src="../images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
+        <p style="font-size: 14px;">Welcome, <%= user.getFullName() %></p>
     </div>
     <ul class="sidebar-menu">
-        <li><a href="../student/dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="../student/profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="../student/enrolledCourses.jsp"><i class="fas fa-book"></i> Courses</a></li>
-        <li><a href="../student/lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
-        <li class="active"><a href="../student/attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
-        <li><a href="../student/notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
-        <li><a href="../student/tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="../student/payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
-        <li><a href="../student/progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
-        <li><a href="../student/feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
+        <li><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="enrolledCourses.jsp"><i class="fas fa-book"></i> Courses</a></li>
+        <li><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
+        <li class="active"><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
+        <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
+        <li><a href="feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
     </ul>
-
-    <div class="sidebar-footer">
-        <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div class="sidebar-footer text-center">
+        <form action="<%= request.getContextPath() %>/LogoutServlet" method="post">
+            <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </form>
     </div>
 </aside>
 
 <!-- ===== MAIN CONTENT ===== -->
 <main class="main-content">
-    <div class="container-fluid">
-        <header class="dashboard-header text-center mb-5">
-            <h1>Attendance Overview</h1>
-            <div class="d-flex flex-column align-items-center">
-                <h5 class="mt-3 mb-2 text-muted">Overall Attendance</h5>
-                <div class="progress-circle" data-percentage="88">
-                    <span>88%</span>
-                </div>
-            </div>
-        </header>
+    <header class="text-center mb-5">
+        <h1 style="color: var(--primary);">Attendance Overview</h1>
+        <div class="progress-circle">
+            <span><%= overallPercent %>%</span>
+        </div>
+        <p class="text-muted">Overall attendance for <strong><%= user.getFullName() %></strong></p>
+    </header>
 
-        <!-- ===== COURSE-WISE ATTENDANCE ===== -->
-        <section class="attendance-section">
-            <h2 class="mb-4 text-center text-dark fw-semibold">Course-wise Attendance</h2>
-            <div class="row g-4 justify-content-center">
-                <div class="col-md-4 col-sm-6">
-                    <div class="course-card">
-                        <h3>Java Full Stack</h3>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 92%;"></div>
-                        </div>
-                        <p class="mt-2 fw-semibold">92% attended</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="course-card">
-                        <h3>Python for Beginners</h3>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 85%;"></div>
-                        </div>
-                        <p class="mt-2 fw-semibold">85% attended</p>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-6">
-                    <div class="course-card">
-                        <h3>Frontend Development</h3>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 78%;"></div>
-                        </div>
-                        <p class="mt-2 fw-semibold">78% attended</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <a href="#" class="btn btn-primary mt-4"><i class="fas fa-download"></i> Download Attendance Report</a>
-            </div>
-        </section>
-    </div>
+    <!-- Attendance Table -->
+    <section class="attendance-table">
+        <h4 class="mb-3 text-primary">Detailed Attendance</h4>
+        <table class="table table-bordered table-hover">
+            <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Lecture Date</th>
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+            </thead>
+            <tbody>
+            <% if (attendanceList.isEmpty()) { %>
+            <tr><td colspan="4" class="text-center text-muted">No attendance records found.</td></tr>
+            <% } else {
+                for (Attendance a : attendanceList) { %>
+            <tr>
+                <td><%= a.getCourseName() %></td>
+                <td><%= a.getLectureDate() %></td>
+                <td class="<%= a.getStatus().equalsIgnoreCase("PRESENT") ? "status-present" : "status-absent" %>">
+                    <%= a.getStatus() %>
+                </td>
+                <td><%= a.getRemarks() != null ? a.getRemarks() : "-" %></td>
+            </tr>
+            <% } } %>
+            </tbody>
+        </table>
+    </section>
 </main>
-
-<!-- ===== SCRIPTS ===== -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // Animate progress bars
-    window.addEventListener('load', () => {
-        document.querySelectorAll('.progress').forEach(p => {
-            const width = p.getAttribute('style').match(/\d+/)[0];
-            p.style.width = '0';
-            setTimeout(() => { p.style.width = width + '%'; }, 200);
-        });
-    });
-
-    // Logout alert
-    document.querySelector('.logout-btn').addEventListener('click', () => {
-        alert('You have been logged out!');
-        window.location.href = '../login.html';
-    });
-</script>
 </body>
 </html>

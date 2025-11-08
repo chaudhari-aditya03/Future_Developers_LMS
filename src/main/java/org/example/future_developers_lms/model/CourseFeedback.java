@@ -29,5 +29,21 @@ public class CourseFeedback {
 
     public Timestamp getSubmittedAt() { return submittedAt; }
     public void setSubmittedAt(Timestamp submittedAt) { this.submittedAt = submittedAt; }
+
+    public boolean getSubject() {
+        return false;
+    }
+
+    public boolean getMessage() {
+        return false;
+    }
+
+    public String getStatus() {
+        return null;
+    }
+
+    public Timestamp getSubmittedDate() {
+        return submittedAt;
+    }
 }
 

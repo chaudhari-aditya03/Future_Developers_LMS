@@ -1,20 +1,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, org.example.future_developers_lms.model.Lecture" %>
-<%
-    // Fetch session details
-    HttpSession userSession = request.getSession(false); // false => don't create new
-    String username = null;
-    if (userSession != null) {
-        username = (String) userSession.getAttribute("username");
-    }
+<%@ page import="java.util.*, org.example.future_developers_lms.model.Lecture, org.example.future_developers_lms.model.User" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page session="true" %>
 
-    // Redirect if no active session (not logged in or bypassed login)
-    if (username == null) {
-        response.sendRedirect("../views/auth/login.jsp");
+<%
+    // ---- SESSION VALIDATION ----
+    User user = (User) session.getAttribute("user");
+    if (user == null || !"STUDENT".equalsIgnoreCase(user.getRole())) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         return;
     }
 
-    // Get lectures list (set by LectureServlet)
     List<Lecture> lectures = (List<Lecture>) request.getAttribute("lectures");
 %>
 
@@ -23,224 +19,235 @@
 <head>
     <meta charset="UTF-8">
     <title>Lectures | Future Developers LMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap & Fonts -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-color: #1e90a1;
+            --sidebar-bg: #1e90a1;
+            --sidebar-hover: rgba(255, 255, 255, 0.15);
+            --sidebar-active: rgba(255, 255, 255, 0.25);
+            --main-bg: #f8fcfb;
+            --card-bg: #fff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f7f9fb;
             display: flex;
+            background: var(--main-bg);
+            font-family: 'Poppins', sans-serif;
             margin: 0;
+            padding: 0;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 240px;
-            background: linear-gradient(180deg, #003566, #0074e4);
+            width: 250px;
+            background: var(--sidebar-bg);
             color: white;
             height: 100vh;
             position: fixed;
-            left: 0;
-            top: 0;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 0;
         }
 
         .sidebar-header {
             text-align: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
 
-        .sidebar-header img {
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-        }
-
-        .sidebar h2 {
-            font-size: 18px;
-            color: #fff;
-            margin-top: 10px;
+        .sidebar-logo {
+            height: 60px;
+            border-radius: 8px;
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 0;
-            margin: 30px 0;
+            padding: 1rem;
         }
 
-        .sidebar-menu a {
-            display: block;
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu li a {
             color: white;
             text-decoration: none;
-            padding: 12px 25px;
-            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: background 0.3s;
         }
 
-        .sidebar-menu a:hover,
-        .sidebar-menu .active {
-            background: rgba(255, 255, 255, 0.2);
-            border-left: 4px solid #ffcb05;
-            color: #ffcb05;
+        .sidebar-menu li a:hover,
+        .sidebar-menu li.active a {
+            background: var(--sidebar-active);
+        }
+
+        .sidebar-footer {
+            text-align: center;
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
         }
 
         .logout-btn {
-            background-color: #ffcb05;
-            color: #000;
+            background: #1e1e2f;
+            color: white;
             border: none;
-            padding: 10px;
-            border-radius: 20px;
-            width: 80%;
-            margin: 10px auto;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
             cursor: pointer;
-            font-weight: 500;
         }
 
         .logout-btn:hover {
-            background-color: #ffc107;
+            background: #111;
         }
 
-        /* Main */
+        /* Main Content */
         .main-content {
-            margin-left: 240px;
-            padding: 30px;
-            width: calc(100% - 240px);
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 2rem;
         }
 
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
             background: #fff;
             padding: 15px 25px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
         }
 
         .dashboard-header h1 {
-            font-size: 22px;
-            font-weight: 600;
-            color: #004aad;
-        }
-
-        select {
-            border-radius: 6px;
-            padding: 6px 10px;
-            border: 1px solid #ccc;
+            color: var(--primary-color);
+            font-size: 1.8rem;
         }
 
         .lectures-grid {
-            margin-top: 25px;
+            margin-top: 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
 
         .lecture-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: 12px;
             padding: 20px;
-            border-left: 5px solid #0074e4;
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: var(--shadow);
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s;
         }
 
         .lecture-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
 
         .lecture-card h3 {
-            color: #004aad;
             font-size: 18px;
-            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
         }
 
         .lecture-card p {
+            margin: 4px 0;
             font-size: 14px;
-            margin: 5px 0;
         }
 
         .btn-primary {
-            background: linear-gradient(90deg, #004aad, #0074e4);
+            background: var(--primary-color);
             border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-weight: 500;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
 
 <body>
-<!-- Sidebar -->
+
+<!-- ===== SIDEBAR ===== -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <img src="../images/FD.jpeg" alt="Logo">
+        <img src="${pageContext.request.contextPath}/images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
-        <p style="font-size: 14px;">Welcome, <%= username %></p>
+        <p style="font-size: 14px;">Welcome, <%= user.getFullName() %></p>
     </div>
 
     <ul class="sidebar-menu">
         <li><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="enrolledCourses.jsp"><i class="fas fa-book"></i> Courses</a></li>
+        <li><a href="courses.jsp"><i class="fas fa-book"></i> Courses</a></li>
         <li class="active"><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
         <li><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
         <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
         <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
         <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
     </ul>
 
-    <div class="text-center">
-        <form action="../LogoutServlet" method="post">
-            <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div class="sidebar-footer">
+        <form action="${pageContext.request.contextPath}/LogoutServlet" method="post">
+            <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </form>
     </div>
 </aside>
 
-<!-- Main Content -->
+<!-- ===== MAIN CONTENT ===== -->
 <main class="main-content">
-    <div class="dashboard-header">
+    <header class="dashboard-header">
         <h1>Lecture Summary</h1>
-        <form method="get" action="../LectureServlet">
-            <select name="type" onchange="this.form.submit()">
+        <form method="get" action="${pageContext.request.contextPath}/LectureServlet">
+            <select name="type" onchange="this.form.submit()" class="form-select form-select-sm" style="width: 160px;">
                 <option value="all">All</option>
                 <option value="live">Live</option>
                 <option value="recorded">Recorded</option>
             </select>
         </form>
-    </div>
+    </header>
 
     <section class="lectures-grid">
-<%--        <%--%>
-<%--            if (lectures != null && !lectures.isEmpty()) {--%>
-<%--                for (Lecture lec : lectures) {--%>
-<%--        %>--%>
-<%--        <div class="lecture-card">--%>
-<%--            <h3><%= lec.getTitle() %></h3>--%>
-<%--            <p><strong>Instructor:</strong> <%= lec.getInstructor() %></p>--%>
-<%--            <p><strong>Course:</strong> <%= lec.getCourseName() %></p>--%>
-<%--            <p><strong>Date:</strong> <%= lec.getDate() %> | <strong>Time:</strong> <%= lec.getTime() %></p>--%>
-
-<%--            <% if ("live".equalsIgnoreCase(lec.getType())) { %>--%>
-<%--            <a href="<%= lec.getLink() %>" class="btn btn-primary">Join Live</a>--%>
-<%--            <% } else { %>--%>
-<%--            <a href="<%= lec.getLink() %>" class="btn btn-primary">Watch Recorded</a>--%>
-<%--            <% } %>--%>
-<%--        </div>--%>
-<%--        <%--%>
-<%--            }--%>
-<%--        } else {--%>
-<%--        %>--%>
-<%--        <p>No lectures available.</p>--%>
-<%--        <%--%>
-<%--            }--%>
-<%--        %>--%>
+        <c:choose>
+            <c:when test="${not empty lectures}">
+                <c:forEach var="lec" items="${lectures}">
+                    <div class="lecture-card">
+                        <h3>${lec.title}</h3>
+                        <p><strong>Instructor:</strong> ${lec.instructor}</p>
+                        <p><strong>Course:</strong> ${lec.courseName}</p>
+                        <p><strong>Date:</strong> ${lec.date} | <strong>Time:</strong> ${lec.time}</p>
+                        <c:choose>
+                            <c:when test="${lec.type eq 'live'}">
+                                <a href="${lec.link}" target="_blank" class="btn btn-primary">Join Live</a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="${lec.link}" target="_blank" class="btn btn-primary">Watch Recorded</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <p>No lectures available at the moment.</p>
+            </c:otherwise>
+        </c:choose>
     </section>
 </main>
+
 </body>
 </html>
