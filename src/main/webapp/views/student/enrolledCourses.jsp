@@ -4,7 +4,7 @@
 <%@ page session="true" %>
 
 <%
-    // ---- SESSION VALIDATION ----
+    // --- SESSION VALIDATION ---
     User user = (User) session.getAttribute("user");
     if (user == null || !"STUDENT".equalsIgnoreCase(user.getRole())) {
         response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
@@ -18,36 +18,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Courses | Future Developers LMS</title>
+    <title>My Enrolled Courses | Future Developers LMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Bootstrap & Fonts -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a2c1234567.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary-color: #1e90a1;
-            --sidebar-bg: #1e90a1;
-            --sidebar-active: rgba(255, 255, 255, 0.25);
-            --main-bg: #f8fcfb;
+            --primary: #1e90a1;
+            --bg-main: #f8fbfd;
             --card-bg: #fff;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
         body {
             display: flex;
-            background: var(--main-bg);
+            background: var(--bg-main);
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
         }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
             width: 250px;
-            background: var(--sidebar-bg);
+            background: var(--primary);
             color: white;
             height: 100vh;
             position: fixed;
@@ -89,7 +86,7 @@
 
         .sidebar-menu li a:hover,
         .sidebar-menu li.active a {
-            background: var(--sidebar-active);
+            background: rgba(255,255,255,0.25);
         }
 
         .sidebar-footer {
@@ -111,7 +108,7 @@
             background: #111;
         }
 
-        /* ===== MAIN ===== */
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 250px;
             width: calc(100% - 250px);
@@ -129,24 +126,11 @@
         }
 
         .dashboard-header h1 {
-            color: var(--primary-color);
+            color: var(--primary);
             font-size: 1.8rem;
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            color: white;
-            font-weight: 500;
-        }
-
-        .btn-primary:hover {
-            background: #157e8f;
-        }
-
-        /* ===== COURSE CARDS ===== */
+        /* ===== COURSES ===== */
         .courses-grid {
             margin-top: 2rem;
             display: grid;
@@ -159,7 +143,7 @@
             border-radius: 12px;
             box-shadow: var(--shadow);
             padding: 20px;
-            border-left: 5px solid var(--primary-color);
+            border-left: 5px solid var(--primary);
             transition: transform 0.3s;
         }
 
@@ -169,7 +153,7 @@
 
         .course-card h3 {
             font-size: 18px;
-            color: var(--primary-color);
+            color: var(--primary);
         }
 
         .course-card p {
@@ -178,7 +162,7 @@
         }
 
         .btn-secondary {
-            background: var(--primary-color);
+            background: var(--primary);
             color: #fff;
             border: none;
             padding: 6px 12px;
@@ -188,7 +172,7 @@
         }
 
         .btn-secondary:hover {
-            background: #147382;
+            background: #157e8f;
         }
 
         @media (max-width: 992px) {
@@ -209,14 +193,16 @@
     </div>
 
     <ul class="sidebar-menu">
-        <li><a href="dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
-        <li class="active"><a href="courses.jsp"><i class="fas fa-book"></i> Courses</a></li>
-        <li><a href="lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
-        <li><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
-        <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
-        <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li class="active"><a href="<%= request.getContextPath() %>/CourseServlet?action=enrolled"><i class="fas fa-book"></i> Enrolled Courses</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
+        <li><a href="<%= request.getContextPath() %>/student/feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
     </ul>
 
     <div class="sidebar-footer">
@@ -229,11 +215,8 @@
 <!-- ===== MAIN CONTENT ===== -->
 <main class="main-content">
     <header class="dashboard-header">
-        <h1>My Courses</h1>
-        <form action="${pageContext.request.contextPath}/CourseServlet" method="get">
-            <input type="hidden" name="action" value="all">
-            <button class="btn-primary" type="submit">Enroll in New Course</button>
-        </form>
+        <h1>My Enrolled Courses</h1>
+        <a href="<%= request.getContextPath() %>/CourseServlet?action=all" class="btn btn-primary">Browse More Courses</a>
     </header>
 
     <section class="courses-grid">
@@ -241,8 +224,10 @@
             <c:when test="${not empty enrolledCourses}">
                 <c:forEach var="course" items="${enrolledCourses}">
                     <div class="course-card">
-                        <h3>${course.courseName}</h3>
-                        <p><strong>Instructor:</strong> ${course.instructor}</p>
+                        <h3>${course.title}</h3>
+                        <p><strong>Category:</strong> ${course.category}</p>
+                        <p><strong>Duration:</strong> ${course.duration}</p>
+                        <p><strong>Level:</strong> ${course.level}</p>
                         <p><strong>Status:</strong> ${course.status}</p>
                         <form action="${pageContext.request.contextPath}/CourseServlet" method="post">
                             <input type="hidden" name="action" value="unenroll">
@@ -258,6 +243,5 @@
         </c:choose>
     </section>
 </main>
-
 </body>
 </html>

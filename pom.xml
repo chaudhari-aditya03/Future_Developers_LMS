@@ -23,6 +23,8 @@
     </properties>
 
     <dependencies>
+
+
         <!-- https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api -->
         <dependency>
             <groupId>mysql</groupId>

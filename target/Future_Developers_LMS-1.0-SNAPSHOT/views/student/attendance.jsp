@@ -160,7 +160,7 @@
         <li class="active"><a href="attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
         <li><a href="notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
         <li><a href="tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
+        <li><a href="payment.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
         <li><a href="progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
         <li><a href="feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
     </ul>

@@ -44,13 +44,13 @@ public class StudentDashboardServlet extends HttpServlet {
         int studentId = user.getUserId();
 
         // Fetch dashboard data using service layer
-        int enrolledCourses = enrollmentService.getEnrolledCourseCount(studentId);
+      // int enrolledCourses = enrollmentService.getEnrolledCourseCount(studentId);
         int completedLectures = lectureService.getCompletedLectureCount(studentId);
         double attendancePercent = attendanceService.getAttendancePercentage(studentId);
         int upcomingTests = testService.getUpcomingTestsCount(studentId);
 
         // Set attributes for JSP
-        request.setAttribute("enrolledCourses", enrolledCourses);
+      //  request.setAttribute("enrolledCourses", enrolledCourses);
         request.setAttribute("completedLectures", completedLectures);
         request.setAttribute("attendancePercent", attendancePercent);
         request.setAttribute("upcomingTests", upcomingTests);

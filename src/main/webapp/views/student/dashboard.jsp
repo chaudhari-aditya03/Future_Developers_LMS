@@ -10,11 +10,15 @@
         return;
     }
 
-    // ===== Dummy dashboard data (to replace later with Service layer) =====
-    int enrolledCourses = (int) (request.getAttribute("enrolledCount") != null ? request.getAttribute("enrolledCount") : 3);
-    int attendancePercent = (int) (request.getAttribute("attendancePercent") != null ? request.getAttribute("attendancePercent") : 86);
-    int totalTests = (int) (request.getAttribute("totalTests") != null ? request.getAttribute("totalTests") : 5);
-    int totalNotes = (int) (request.getAttribute("totalNotes") != null ? request.getAttribute("totalNotes") : 8);
+    // ===== Dummy dashboard data (replace with Service layer later) =====
+    int enrolledCourses = (request.getAttribute("enrolledCount") != null)
+            ? (Integer) request.getAttribute("enrolledCount") : 3;
+    int attendancePercent = (request.getAttribute("attendancePercent") != null)
+            ? (Integer) request.getAttribute("attendancePercent") : 86;
+    int totalTests = (request.getAttribute("totalTests") != null)
+            ? (Integer) request.getAttribute("totalTests") : 5;
+    int totalNotes = (request.getAttribute("totalNotes") != null)
+            ? (Integer) request.getAttribute("totalNotes") : 8;
 %>
 
 <!DOCTYPE html>
@@ -166,26 +170,27 @@
 <!-- ===== SIDEBAR ===== -->
 <aside class="sidebar">
     <div class="sidebar-header">
-        <img src="../assets/images/FD.jpeg" alt="Logo" class="sidebar-logo">
+        <img src="${pageContext.request.contextPath}/images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
         <p style="font-size: 14px;">Welcome, <%= student.getFullName() %></p>
     </div>
 
     <ul class="sidebar-menu">
-        <li class="active"><a href="<%= request.getContextPath() %>../assets/student/dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/enrolledCourses.jsp"><i class="fas fa-book"></i> Courses</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/lectures.jsp"><i class="fas fa-video"></i> Lectures</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/attendance.jsp"><i class="fas fa-check-circle"></i> Attendance</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/notes.jsp"><i class="fas fa-file-alt"></i> Notes</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/tests.jsp"><i class="fas fa-pen"></i> Tests</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/payments.jsp"><i class="fas fa-wallet"></i> Payments</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/progress.jsp"><i class="fas fa-chart-line"></i> Progress</a></li>
-        <li><a href="<%= request.getContextPath() %>/views/student/feedback.jsp"><i class="fas fa-comment-dots"></i> Feedback</a></li>
+        <li class="active"><a href="${pageContext.request.contextPath}/views/student/dashboard.jsp"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="${pageContext.request.contextPath}/views/student/profile.jsp"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="${pageContext.request.contextPath}/CourseServlet?action=all"><i class="fas fa-book"></i> Apply For Courses</a></li>
+        <li><a href="${pageContext.request.contextPath}/CourseServlet?action=enrolled"><i class="fas fa-list"></i> Enrolled Courses</a></li>
+        <li><a href="${pageContext.request.contextPath}/LectureServlet"><i class="fas fa-video"></i> Lectures</a></li>
+        <li><a href="${pageContext.request.contextPath}/AttendanceServlet"><i class="fas fa-check-circle"></i> Attendance</a></li>
+        <li><a href="${pageContext.request.contextPath}/NotesServlet"><i class="fas fa-file-alt"></i> Notes</a></li>
+        <li><a href="${pageContext.request.contextPath}/TestServlet"><i class="fas fa-pen"></i> Tests</a></li>
+        <li><a href="${pageContext.request.contextPath}/PaymentServlet"><i class="fas fa-wallet"></i> Payments</a></li>
+        <li><a href="${pageContext.request.contextPath}/ProgressServlet"><i class="fas fa-chart-line"></i> Progress</a></li>
+        <li><a href="${pageContext.request.contextPath}/FeedbackServlet"><i class="fas fa-comment-dots"></i> Feedback</a></li>
     </ul>
 
     <div class="sidebar-footer text-center">
-        <form action="<%= request.getContextPath() %>/LogoutServlet" method="post">
+        <form action="${pageContext.request.contextPath}/LogoutServlet" method="post">
             <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </form>
     </div>

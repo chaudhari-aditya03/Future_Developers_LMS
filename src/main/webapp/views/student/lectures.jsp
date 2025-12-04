@@ -1,16 +1,34 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, org.example.future_developers_lms.model.Lecture, org.example.future_developers_lms.model.User" %>
+<%@ page import="java.util.*, org.example.future_developers_lms.model.Lecture, org.example.future_developers_lms.model.User, org.example.future_developers_lms.service.EnrollmentService" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page session="true" %>
 
 <%
-    // ---- SESSION VALIDATION ----
-    User user = (User) session.getAttribute("user");
-    if (user == null || !"STUDENT".equalsIgnoreCase(user.getRole())) {
+    // ✅ Step 1: Session Validation
+    HttpSession sessionUser = request.getSession(false);
+    User student = null;
+    if (sessionUser == null || (student = (User) sessionUser.getAttribute("user")) == null) {
         response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         return;
     }
 
+    // ✅ Step 2: Get courseId (from request param or default)
+    String courseParam = request.getParameter("courseId");
+    int courseId = (courseParam != null) ? Integer.parseInt(courseParam) : 0;
+
+    // ✅ Step 3: Check access using EnrollmentService
+    boolean hasAccess = false;
+    if (courseId > 0) {
+        EnrollmentService es = new EnrollmentService();
+        hasAccess = es.isCourseActive(student.getUserId(), courseId);
+    }
+
+    if (!hasAccess) {
+        out.println("<h4 style='color:red; text-align:center; margin-top:50px;'>⚠️ Please complete payment to access this course.</h4>");
+        return;
+    }
+
+    // ✅ Step 4: Fetch lecture list (sent by servlet)
     List<Lecture> lectures = (List<Lecture>) request.getAttribute("lectures");
 %>
 
@@ -30,7 +48,6 @@
         :root {
             --primary-color: #1e90a1;
             --sidebar-bg: #1e90a1;
-            --sidebar-hover: rgba(255, 255, 255, 0.15);
             --sidebar-active: rgba(255, 255, 255, 0.25);
             --main-bg: #f8fcfb;
             --card-bg: #fff;
@@ -73,10 +90,6 @@
             padding: 1rem;
         }
 
-        .sidebar-menu li {
-            margin-bottom: 5px;
-        }
-
         .sidebar-menu li a {
             color: white;
             text-decoration: none;
@@ -93,26 +106,6 @@
             background: var(--sidebar-active);
         }
 
-        .sidebar-footer {
-            text-align: center;
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .logout-btn {
-            background: #1e1e2f;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 25px;
-            cursor: pointer;
-        }
-
-        .logout-btn:hover {
-            background: #111;
-        }
-
-        /* Main Content */
         .main-content {
             margin-left: 250px;
             width: calc(100% - 250px);
@@ -123,7 +116,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
             background: #fff;
             padding: 15px 25px;
             border-radius: 10px;
@@ -138,15 +130,15 @@
         .lectures-grid {
             margin-top: 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.5rem;
         }
 
         .lecture-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px;
             box-shadow: var(--shadow);
+            padding: 20px;
             border-left: 5px solid var(--primary-color);
             transition: transform 0.3s;
         }
@@ -158,7 +150,6 @@
         .lecture-card h3 {
             font-size: 18px;
             color: var(--primary-color);
-            margin-bottom: 8px;
         }
 
         .lecture-card p {
@@ -188,7 +179,7 @@
     <div class="sidebar-header">
         <img src="${pageContext.request.contextPath}/images/FD.jpeg" alt="Logo" class="sidebar-logo">
         <h2>Future Developers</h2>
-        <p style="font-size: 14px;">Welcome, <%= user.getFullName() %></p>
+        <p style="font-size: 14px;">Welcome, <%= student.getFullName() %></p>
     </div>
 
     <ul class="sidebar-menu">

@@ -16,6 +16,11 @@ public class Course {
     private String status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private double discountPrice;
+
+    public double getDiscountPrice() { return discountPrice; }
+    public void setDiscountPrice(double discountPrice) { this.discountPrice = discountPrice; }
+
 
     public int getCourseId() { return courseId; }
     public void setCourseId(int courseId) { this.courseId = courseId; }
